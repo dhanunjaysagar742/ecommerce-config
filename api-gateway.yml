@@ -1,4 +1,3 @@
-
 server:
   port: 8080
 
@@ -7,55 +6,45 @@ spring:
     name: API-GATEWAY
 
   cloud:
-
     gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
 
-      discovery:
+          routes:
+            - id: user-auth
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/v1/auth/**
 
-        locator:
+            - id: user-api
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/v1/users/**
 
-          enabled: true
-
-          lower-case-service-id: true
-
-      routes:
-
-        - id: user-auth
-
-          uri: lb://USER-SERVICE
-
-          predicates:
-
-            - Path=/api/v1/auth/**
-
-        - id: user-api
-
-          uri: lb://USER-SERVICE
-
-          predicates:
-
-            - Path=/api/v1/users/**
+            - id: product-api
+              uri: lb://PRODUCT-SERVICE
+              predicates:
+                - Path=/api/v1/products/**
 
 eureka:
-
   client:
-
     service-url:
-
       defaultZone: http://localhost:8761/eureka/
 
 management:
-
   endpoints:
-
     web:
-
       exposure:
-
         include: "*"
 
 logging:
-
   level:
-
     org.springframework.cloud.gateway: INFO
+
+jwt:
+  secret: ZGhhbnVuamF5c2FnYXIxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTA=
+  expiration: 86400000
